@@ -310,4 +310,3 @@ Thumbs.db
 
 # End of https://www.gitignore.io/api/gradle,kotlin,android,intellij+all,androidstudio
 /QR_Code/Provision.png
-!SetupSkip.app.*.iml
