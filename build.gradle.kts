@@ -3,28 +3,35 @@ buildscript {
         google()
         jcenter()
         maven("https://maven.google.com")
+        maven ("https://dl.bintray.com/kotlin/kotlin-eap")
+        maven("https://maven.pkg.github.com/")
         mavenCentral()
         mavenLocal()
         gradlePluginPortal()
     }
     dependencies {
         classpath(group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin")
-        classpath("com.android.tools.build:gradle:3.5.0")
-        classpath("com.google.gms:google-services:4.3.2")
+        classpath("com.android.tools.build:gradle:3.5.3")
+        classpath("com.google.gms:google-services:4.3.3")
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.9.7")
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.2.0-alpha02")
-    }
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.2.0-rc04")
+//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.70-eap-42")
+   }
 }
 
 plugins {
     base
     id("com.gradle.build-scan") version "2.3"
     kotlin("jvm") apply false
-    id("org.jetbrains.kotlin.multiplatform") apply false
+    kotlin("multiplatform") apply false
     kotlin("android") apply false
     kotlin("android.extensions") apply false
     kotlin("kapt") apply false
+    id("org.hidetake.ssh") version "2.10.1"
 }
+
+fun findProperty(propertyName: String): String? =
+    project.findProperty(propertyName) as String? ?: System.getenv(propertyName)
 
 val Project.type: String?
     get() = when {
@@ -42,7 +49,10 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
     apply(plugin = "org.jetbrains.kotlin.kapt")
     when {
-        application -> { apply(plugin = "com.android.application") }
+        application -> { 
+            apply(plugin = "com.android.application") 
+            apply(plugin = "org.hidetake.ssh") 
+        }
         library -> { apply(plugin = "com.android.library") }
         else -> { return@subprojects }
     }

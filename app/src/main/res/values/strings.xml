@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">android-app</string>
+    <string name="app_name">Setup Wizard Skip</string>
+    <string name="sample_device_admin">Setup Wizard Skip</string>
+    <string name="sample_device_admin_description">SKips as much of the setup wizard as possible, and sets USB Debugging to on.</string>
 </resources>

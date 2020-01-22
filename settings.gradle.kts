@@ -10,24 +10,25 @@ pluginManagement {
                     useVersion(getVersion("3.5.5"))
                 }
                 requested.id.namespace.toString().startsWith("org.jetbrains.kotlin",true) -> {
-                    useVersion(getVersion("1.3.50"))
+                    println("${requested.id.id}: ${requested.version}")
+                    useVersion(getVersion("1.3.61"))
                 }
             }
         }
     }
     repositories {
-        google()
         jcenter()
-        mavenCentral()
-        maven("https://dl.bintray.com/kotlin/kotlin-dev")
+        gradlePluginPortal()
         maven("https://dl.bintray.com/kotlin/kotlin-eap")
+        maven("https://dl.bintray.com/kotlin/kotlin-dev")
         maven("https://kotlin.bintray.com/kotlinx")
         maven("https://maven.fabric.io/public")
         maven("https://maven.google.com")
         maven("https://jitpack.io")
         maven("https://plugins.gradle.org/m2/")
+        google()
+        mavenCentral()
         mavenLocal()
-        gradlePluginPortal()
     }
 }
 // Configure this per project
@@ -39,9 +40,7 @@ enableFeaturePreview("GRADLE_METADATA")
 
 fun PluginResolveDetails.getVersion(fallback: String) =
         if (!requested.version.isNullOrBlank()) {
-//            println("\tUsing ${requested.version}")
             requested.version as String
         } else {
-//            println("\tUsing $fallback")
             fallback
         }
