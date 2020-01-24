@@ -309,4 +309,4 @@ Thumbs.db
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.gitignore.io/api/gradle,kotlin,android,intellij+all,androidstudio
-/QR_Code/Provision.png
+/QR_Code/*.png

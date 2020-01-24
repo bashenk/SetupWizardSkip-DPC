@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">Setup Wizard Skip</string>
-    <string name="sample_device_admin">Setup Wizard Skip</string>
-    <string name="sample_device_admin_description">SKips as much of the setup wizard as possible, and sets USB Debugging to on.</string>
+    <string name="accessibility_service_label">Setup Wizard Skip Accessibility Service</string>
+    <string name="accessibility_service_description">Allows automatic button presses</string>
+    <string name="device_admin">Setup Wizard Skip</string>
+    <string name="device_admin_description">SKips as much of the setup wizard as possible, and sets USB Debugging to on.</string>
+    <string name="reset_short_label">Reset</string>
+    <string name="reset_long_label">Factory Reset</string>
+    <string name="unlock_short_label">Unlock</string>
+    <string name="unlock_long_label">Remove Device Owner</string>
 </resources>

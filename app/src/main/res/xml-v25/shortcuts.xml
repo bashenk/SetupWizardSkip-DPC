@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="factory_reset"
+        android:enabled="true"
+        android:icon="@drawable/reset_foreground"
+        android:shortcutShortLabel="@string/reset_short_label"
+        android:shortcutLongLabel="@string/reset_long_label"
+        >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="net.csgstore.setupskip"
+            android:targetClass="net.csgstore.setupskip.Reset" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="remove_admin"
+        android:enabled="true"
+        android:icon="@drawable/unlock_foreground"
+        android:shortcutShortLabel="@string/unlock_short_label"
+        android:shortcutLongLabel="@string/unlock_long_label"
+        >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="net.csgstore.setupskip"
+            android:targetClass="net.csgstore.setupskip.Unlock" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+</shortcuts>

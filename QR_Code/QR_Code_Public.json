@@ -1,0 +1,13 @@
+{
+  "android.app.extra.PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME": "net.csgstore.setupskip/net.csgstore.setupskip.AdminReceiver",
+  "android.app.extra.PROVISIONING_DEVICE_ADMIN_PACKAGE_DOWNLOAD_LOCATION": "http://csgslicks.com/SetupSkip.apk",
+  "android.app.extra.PROVISIONING_DEVICE_ADMIN_SIGNATURE_CHECKSUM": "V-NExE3iSSvi8UCdojzMmJVxmBz4icJJQmjIRwJCRDc=",
+  "android.app.extra.PROVISIONING_MAIN_COLOR": 4294967295,
+  "android.app.extra.PROVISIONING_MODE": 1,
+  "android.app.extra.PROVISIONING_LEAVE_ALL_SYSTEM_APPS_ENABLED": true,
+  "android.app.extra.PROVISIONING_LOCALE": "en_US",
+  "android.app.extra.PROVISIONING_SKIP_EDUCATION_SCREENS": true,
+  "android.app.extra.PROVISIONING_SKIP_ENCRYPTION": true,
+  "android.app.extra.PROVISIONING_SKIP_USER_CONSENT": true,
+  "android.app.extra.PROVISIONING_TIME_ZONE": "America/New_York"
+}

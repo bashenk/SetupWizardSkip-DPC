@@ -14,7 +14,7 @@ buildscript {
         classpath("com.android.tools.build:gradle:3.5.3")
         classpath("com.google.gms:google-services:4.3.3")
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.9.7")
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.2.0-rc04")
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.2.0")
 //        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.70-eap-42")
    }
 }
@@ -25,7 +25,7 @@ plugins {
     kotlin("jvm") apply false
     kotlin("multiplatform") apply false
     kotlin("android") apply false
-    kotlin("android.extensions") apply false
+//    kotlin("android.extensions") apply false
     kotlin("kapt") apply false
     id("org.hidetake.ssh") version "2.10.1"
 }
@@ -50,16 +50,22 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.kapt")
     when {
         application -> { 
-            apply(plugin = "com.android.application") 
+            apply(plugin = "com.android.application")
             apply(plugin = "org.hidetake.ssh") 
         }
         library -> { apply(plugin = "com.android.library") }
         else -> { return@subprojects }
     }
-    apply(plugin = "org.jetbrains.kotlin.android.extensions")
-    apply(plugin = "androidx.navigation.safeargs.kotlin")
+//    apply(plugin = "org.jetbrains.kotlin.android.extensions")
+//    apply(plugin = "androidx.navigation.safeargs.kotlin")
 }
-
+apply(plugin = "java")
+tasks {
+    named<Test>("test") {
+        testLogging.showExceptions = true
+        useJUnitPlatform()
+    }
+}
 allprojects {
     repositories {
         google()

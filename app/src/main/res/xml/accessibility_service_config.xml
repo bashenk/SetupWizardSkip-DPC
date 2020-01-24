@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:description="@string/accessibility_service_description"
+    android:packageNames="net.csgstore.setupskip"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeViewHoverExit"
+    android:accessibilityFeedbackType="feedbackAllMask"
+    android:accessibilityFlags="flagDefault|flagIncludeNotImportantViews|flagReportViewIds|flagRetrieveInteractiveWindows|flagRequestFilterKeyEvents|flagRequestTouchExplorationMode"
+    android:canPerformGestures="true"
+    android:canRequestFilterKeyEvents="true"
+    android:canRequestFingerprintGestures="false"
+    android:canRequestTouchExplorationMode="true"
+    android:canRetrieveWindowContent="true"
+    android:notificationTimeout="100"
+    tools:ignore="UnusedAttribute"
+    />
+
+    <!--<accessibility-service-->
+    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:description="@string/accessibility_service_description"-->
+    <!--android:accessibilityEventTypes="typeAllMask"-->
+    <!--android:accessibilityFeedbackType="feedbackAllMask"-->
+    <!--android:accessibilityFlags="flagDefault|flagIncludeNotImportantViews|flagReportViewIds|flagRetrieveInteractiveWindows|flagRequestFilterKeyEvents"-->
+    <!--android:canPerformGestures="true"-->
+    <!--android:canRequestFilterKeyEvents="true"-->
+    <!--android:canRequestFingerprintGestures="false"-->
+    <!--android:canRequestTouchExplorationMode="false"-->
+    <!--android:canRetrieveWindowContent="true"-->
+    <!--android:notificationTimeout="10"-->
+    <!--android:packageNames="com.android.settings,com.samsung.spg,com.android.packageinstaller,com.google.android.packageinstaller"-->
+    <!--tools:ignore="UnusedAttribute"-->
+    <!--/>-->
+    <!--android:packageNames="com.android.settings,com.samsung.spg,com.android.packageinstaller,com.google.android.packageinstaller"-->
+    <!--android:packageNames="net.csgstore.connectioncontroller,com.android.settings,com.samsung.spg,com.android.packageinstaller,com.google.android.packageinstaller"-->
+    <!--android:packageNames="net.csgstore.connectioncontroller,com.android.settings,com.samsung.spg,com.android.packageinstaller,com.google.android.packageinstaller,com.android.systemui"-->
+
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:description="@string/accessibility_service_description"-->
+<!--    android:packageNames="net.csgstore.setupskip"-->
+<!--    android:accessibilityEventTypes="typeAllMask"-->
+<!--    android:accessibilityFlags="flagDefault"-->
+<!--    android:accessibilityFeedbackType="feedbackSpoken"-->
+<!--    android:notificationTimeout="100"-->
+<!--    android:canRetrieveWindowContent="true"-->
+<!--    android:settingsActivity="com.example.android.accessibility.ServiceSettingsActivity"-->
+<!--    />-->
