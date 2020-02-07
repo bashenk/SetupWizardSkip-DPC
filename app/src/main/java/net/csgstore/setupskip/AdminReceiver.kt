@@ -1,152 +1,75 @@
 package net.csgstore.setupskip
 
 import android.Manifest
+import android.app.Activity
 import android.app.PendingIntent
 import android.app.admin.DeviceAdminReceiver
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInstaller.SessionParams
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
-import android.net.wifi.WifiManager
-import android.os.*
+import android.os.Build
 import android.os.Build.VERSION_CODES
+import android.os.UserManager
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import org.junit.runner.RunWith
-import java.io.IOException
+import java.lang.ref.WeakReference
 
+fun Context.isAdminActive(): Boolean =
+    checkIfAdminActive(devicePolicyManager, ComponentName(this, AdminReceiver::class.java))
 
-@RunWith(AndroidJUnit4ClassRunner::class)
+fun Activity.showActivateAdminPermissionRequest(reason: String? = null) {
+    val mDeviceAdmin = ComponentName(this, AdminReceiver::class.java)
+    doActivateAdminPermissionRequest(mDeviceAdmin,  reason)
+//    isAdminActive()
+}
+
 open class AdminReceiver : DeviceAdminReceiver() {
 
-    override fun onReceive(context: Context, intent: Intent) {
-        when (intent.action) {
-            ACTION_PROFILE_PROVISIONING_COMPLETE -> setDevicePolicySettings(context)
-            //            Intent.ACTION_CREATE_SHORTCUT -> context.startActivity(Intent(context, MakeShortcuts::class.java))
-            INTENT_FACTORY_RESET -> factoryReset(context)
-            INTENT_REMOVE_DEVICE_ADMIN -> {
-                removeDeviceAdminFromSelf(context)
-                uninstallPackage(context)
-            }
-        }
-        super.onReceive(context, intent)
-    }
-
     override fun onEnabled(context: Context, intent: Intent) {
-        val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
-        val adminName = getWho(context)
-        val flags = when {
-            Build.VERSION.SDK_INT >= VERSION_CODES.P -> DevicePolicyManager.SKIP_SETUP_WIZARD and DevicePolicyManager.LEAVE_ALL_SYSTEM_APPS_ENABLED
-            Build.VERSION.SDK_INT >= VERSION_CODES.N -> DevicePolicyManager.SKIP_SETUP_WIZARD
-            else -> 0
-        }
-        val userHandle = if (Build.VERSION.SDK_INT >= VERSION_CODES.N) {
-            context.devicePolicyManager.createAndManageUser(adminName, "Tester", adminName, null, flags)
-        } else Binder.getCallingUserHandle()
-        val serialNumber = userManager.getSerialNumberForUser(userHandle)
-        setDevicePolicySettings(context)
-        Log.i(TAG, "Device admin enabled for user with serial number: $serialNumber")
         super.onEnabled(context, intent)
+        Log.e(TAG, "Exception: AdminReceiver.onProvisioningComplete() invoked")
+        val task = getPostProvisioningTask(context)
+        if (!task.performPostProvisioningOperations(intent)) return
     }
 
     override fun onProfileProvisioningComplete(context: Context, intent: Intent) {
-        setDevicePolicySettings(context)
-        context.startActivity(Intent(context.applicationContext, Dummy::class.java))
-        super.onProfileProvisioningComplete(context, intent)
-    }
-
-    private fun removeDeviceAdminFromSelf(context: Context) {
-        val notOwnerOrAdministrator =
-            "Setup Wizard Skip is already not a device owner/administrator"
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP && Build.VERSION.SDK_INT < VERSION_CODES.O && context.isThisDeviceOwner) {
-            try {
-                @Suppress("DEPRECATION") context.devicePolicyManager.clearDeviceOwnerApp(PACKAGE_NAME)
-                context.showToast(
-                    "Successfully disabled device owner for package Setup Wizard Skip")
-            } catch (e: Exception) {
-                context.showToast("Setup Wizard Skip is already not a device owner")
-            }
-        } else if (!context.isThisDeviceOwner && context.isAdminActive(AdminReceiver::class.java)) {
-            try {
-                context.devicePolicyManager.removeActiveAdmin(getWho(context))
-                context.showToast(
-                    "Successfully disabled device administrator for package Setup Wizard Skip")
-            } catch (e: Exception) {
-                context.showToast(notOwnerOrAdministrator)
-            }
+        Log.e(TAG, "Exception: AdminReceiver.onProvisioningComplete() invoked")
+        val task = getPostProvisioningTask(context)
+        if (!task.performPostProvisioningOperations(intent)) return
+        val launchIntent = task.getPostProvisioningLaunchIntent(intent)
+        if (launchIntent != null) {
+            context.startActivity(launchIntent)
         } else {
-            context.showToast(notOwnerOrAdministrator)
+            val msg = "AdminReceiver.onProvisioningComplete() invoked, but ownership not assigned"
+            Log.e(TAG, msg)
+            context.showToast(msg, Toast.LENGTH_LONG)
         }
-    }
 
-    private fun Context.showToast(text: String) {
-        Handler(Looper.getMainLooper()).post {
-            Toast.makeText(applicationContext, text, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun uninstallPackage(context: Context, packageName: String = PACKAGE_NAME): Boolean {
-        if (Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-            val packageInstaller = context.packageManager.packageInstaller
-            val params = SessionParams(SessionParams.MODE_FULL_INSTALL)
-            params.setAppPackageName(packageName)
-            val sessionId = try {
-                packageInstaller.createSession(params)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                return false
-            }
-            packageInstaller.uninstall(packageName,
-                PendingIntent.getBroadcast(context, sessionId, Intent("android.intent.action.MAIN"),
-                    0).intentSender)
-            return true
-        }
-        System.err.println("old sdk")
-        return false
-    }
-
-    private fun factoryReset(context: Context) {
-        context.devicePolicyManager.wipeData(context.getResetFlags())
-    }
-
-    /**
-     * Bit mask of additional options: currently supported flags are [DevicePolicyManager.WIPE_EXTERNAL_STORAGE] and
-     * [DevicePolicyManager.WIPE_RESET_PROTECTION_DATA].
-     *
-     * Can be one or all of 0, [DevicePolicyManager.WIPE_EXTERNAL_STORAGE], and
-     * [DevicePolicyManager.WIPE_RESET_PROTECTION_DATA].
-     *
-     * Apparently, [DevicePolicyManager.WIPE_EUICC] is as-yet unimplemented.
-     *
-     * @param  this@getFlags [Context] from which to retrieve the [DevicePolicyManager] and package name.
-     * @return [Int]   The bitmask for the most destructive reset action possible with the given permissions.
-     */
-    //    @SuppressLint("ObsoleteSdkInt")
-    private fun Context.getResetFlags(wipeResetProtection: Boolean = true, wipeExternalStorage: Boolean = false, wipeEUICC: Boolean = false): Int {
-        var integer = 0
-        if (wipeExternalStorage && Build.VERSION.SDK_INT > VERSION_CODES.JELLY_BEAN_MR2 && devicePolicyManager.isDeviceOwnerApp(
-                packageName)) {
-            integer = integer or DevicePolicyManager.WIPE_EXTERNAL_STORAGE
-        }
-        if (wipeResetProtection && Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP_MR1) {
-            integer = integer or DevicePolicyManager.WIPE_RESET_PROTECTION_DATA
-        }
-        if (wipeEUICC && Build.VERSION.SDK_INT >= VERSION_CODES.P) {
-            integer = integer or DevicePolicyManager.WIPE_EUICC
-        }
-        return integer
+        context.startActivity(Intent(context.applicationContext, ShortcutCreator::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        super.onProfileProvisioningComplete(context, intent)
     }
 
     companion object {
         const val INTENT_REMOVE_DEVICE_ADMIN = "net.csgstore.setupskip.REMOVE_DEVICE_ADMIN"
-        const val INTENT_FACTORY_RESET = "net.csgstore.setupskip.FACTORY_RESET"
+        const val INTENT_UNINSTALL = "$PACKAGE_NAME.UNINSTALL"
+        const val INTENT_FACTORY_RESET = "$PACKAGE_NAME.FACTORY_RESET"
+        private const val OBEY_DEPRECATION: Boolean = false
+        val componentName: ComponentName by lazy {ComponentName(PACKAGE_NAME, AdminReceiver::class.java.name)}
+        private lateinit var devicePolicyManager: DevicePolicyManager
+        private lateinit var userManager: UserManager
+        private lateinit var provisioningTask: PostProvisioningTask
+
+        fun getPostProvisioningTask(context: Context): PostProvisioningTask {
+//            if (!::provisioningTask.isInitialized)
+                provisioningTask = PostProvisioningTask(WeakReference<Activity>(context as Activity))
+            return provisioningTask
+        }
 
         fun makeShortcuts(context: Context) {
             if (Build.VERSION.SDK_INT < VERSION_CODES.N_MR1) {
@@ -188,26 +111,26 @@ open class AdminReceiver : DeviceAdminReceiver() {
                 val resetSuccessCallback =
                     PendingIntent.getBroadcast(context, /* request code */ 111,
                         resetPinnedShortcutCallbackIntent, /* flags */ 0)
-                shortcutManager.requestPinShortcut(reset, null)
+                shortcutManager.requestPinShortcut(reset, resetSuccessCallback.intentSender)
 
                 val removeAdminPinnedShortcutCallbackIntent =
                     shortcutManager.createShortcutResultIntent(removeAdmin)
                 val removeAdminSuccessCallback =
                     PendingIntent.getBroadcast(context, /* request code */ 222,
                         removeAdminPinnedShortcutCallbackIntent, /* flags */ 0)
-                shortcutManager.requestPinShortcut(removeAdmin, null)
+                shortcutManager.requestPinShortcut(removeAdmin, removeAdminSuccessCallback.intentSender)
             }
         }
 
 
         @RequiresApi(VERSION_CODES.M)
         fun configureAccessibility(context: Context) {
-            context.devicePolicyManager.setPermissionGrantState(componentName, PACKAGE_NAME,
-                Manifest.permission.BIND_ACCESSIBILITY_SERVICE,
+            initializeServices(context)
+            devicePolicyManager.setPermissionGrantState(componentName, PACKAGE_NAME, Manifest.permission.BIND_ACCESSIBILITY_SERVICE,
                 DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)
 //            context.dpm.setSecureSetting(componentName, Settings.Secure.ACCESSIBILITY_ENABLED, "1")
             val prevAccessibilityServices = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES).split(";").filterNot { s -> s == componentName.flattenToString() }.joinToString { ";" }
-            context.devicePolicyManager.setSecureSetting(componentName,
+            devicePolicyManager.setSecureSetting(componentName,
                 Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
                 "$prevAccessibilityServices;${componentName.flattenToString()}")
         }
@@ -228,40 +151,33 @@ open class AdminReceiver : DeviceAdminReceiver() {
 
         @RequiresApi(VERSION_CODES.M)
         fun enableSettingsPermissions(context: Context) {
-            if (!context.devicePolicyManager.setPermissionGrantState(componentName, PACKAGE_NAME,
+            initializeServices(context)
+            if (!devicePolicyManager.setPermissionGrantState(componentName, PACKAGE_NAME,
                     Manifest.permission.WRITE_SETTINGS,
                     DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED) || !context.isWriteSettingsPermissionGranted) throw SecurityException(
                 "Permission ${Manifest.permission.WRITE_SETTINGS} was not granted")
-            if (!context.devicePolicyManager.setPermissionGrantState(componentName, PACKAGE_NAME,
+            if (!devicePolicyManager.setPermissionGrantState(componentName, PACKAGE_NAME,
                     Manifest.permission.WRITE_SECURE_SETTINGS,
-                    DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED) || !context.devicePolicyManager.isWriteSecureSettingsPermissionGranted(
+                    DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED) || !devicePolicyManager.isWriteSecureSettingsPermissionGranted(
                     componentName)) throw SecurityException(
                 "Permission ${Manifest.permission.WRITE_SECURE_SETTINGS} was not granted")
         }
 
-        fun setDevicePolicySettings(context: Context, shouldSetOn: Boolean = true) {
-            val setting = if (shouldSetOn) "1" else "0"
-            context.devicePolicyManager.setGlobalSetting(componentName, Settings.Global.ADB_ENABLED, setting)
-            context.devicePolicyManager.setGlobalSetting(componentName,
-                Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, setting)
-            if (Build.VERSION.SDK_INT < VERSION_CODES.M) {
-                // Changing the following settings has no effect as of {@link android.os.Build.VERSION_CODES#M}
-                context.devicePolicyManager.setGlobalSetting(componentName,
-                    Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, setting)
-                context.devicePolicyManager.setGlobalSetting(componentName, Settings.Global.WIFI_ON, setting)
-            } else {
-                context.devicePolicyManager.setKeyguardDisabled(componentName, shouldSetOn)
-                if (shouldSetOn) {
-                    (context.applicationContext.getSystemService(
-                        Context.WIFI_SERVICE) as WifiManager).isWifiEnabled = true
-                }
-                val plugInState =
-                    if (shouldSetOn) BatteryManager.BATTERY_PLUGGED_AC or BatteryManager.BATTERY_PLUGGED_USB else 0
-                // This setting is only available from {@link android.os.Build.VERSION_CODES#M} onwards and can only be set if {@link #setMaximumTimeToLock} is not used to set a timeout.
-                context.devicePolicyManager.setGlobalSetting(componentName,
-                    Settings.Global.STAY_ON_WHILE_PLUGGED_IN, plugInState.toString())
-            }
+
+        @RequiresApi(VERSION_CODES.M)
+        private fun enablePermissions() {
+//            if (!devicePolicyManager.setPermissionGrantState(AdminReceiver.componentName, PACKAGE_NAME, Manifest.permission.INSTALL_PACKAGES, DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)) throw SecurityException("Permission ${Manifest.permission.INSTALL_PACKAGES} was not granted")
+            if (!devicePolicyManager.setPermissionGrantState(AdminReceiver.componentName, PACKAGE_NAME, Manifest.permission.DELETE_PACKAGES, DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)) throw SecurityException("Permission ${Manifest.permission.DELETE_PACKAGES} was not granted")
         }
+
+        private fun initializeServices(context: Context) {
+            if (!::devicePolicyManager.isInitialized)
+                devicePolicyManager = context.devicePolicyManager
+            if (!::userManager.isInitialized)
+            userManager = context.userManager
+        }
+
+
     }
 }
 

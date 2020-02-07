@@ -1,14 +1,12 @@
 package net.csgstore.setupskip
 
-import android.accessibilityservice.AccessibilityService
-import android.app.Instrumentation
 import android.app.UiAutomation
+import android.content.ComponentName
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.*
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert
@@ -48,7 +46,7 @@ class InstrumentedTest {
             Assert.assertTrue(result)
         } else {
             val prevAccessibilityServices = Settings.Secure.getString(appContext.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES).split(":").filterNot { s -> s.isEmpty() }
-            val flatComponentName = MyAccessibilityService.componentName.flattenToString()
+            val flatComponentName = ComponentName(appContext, MyAccessibilityService::class.java).flattenToString()
             val newAccessibilityServiceList = arrayOf(flatComponentName, *prevAccessibilityServices.toTypedArray());
             val newString = if (newAccessibilityServiceList.isNotEmpty()) newAccessibilityServiceList.joinToString(separator = ":") else null
             val accessibilityServices = "enabled_accessibility_services"

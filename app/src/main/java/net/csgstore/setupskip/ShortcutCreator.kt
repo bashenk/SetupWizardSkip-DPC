@@ -2,6 +2,7 @@ package net.csgstore.setupskip
 
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.ShortcutInfo
@@ -9,13 +10,19 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
+import net.csgstore.setupskip.AdminReceiver.Companion.getPostProvisioningTask
+import net.csgstore.setupskip.ShortcutReceiver.Companion.ACTION_SHORTCUT_ADDED
 
 
-class Dummy : Activity() {
+class ShortcutCreator : Activity() {
+
+    private val runOnce by lazy {Settings.Secure.getInt(this.contentResolver, Settings.Secure.ADB_ENABLED, 0) == 1}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        Companion.runOnce = runOnce || !this.isThisDeviceOwner
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 //            AdminReceiver.enableSettingsPermissions(this)
 //            AdminReceiver.configureAccessibility(this)
@@ -30,6 +37,31 @@ class Dummy : Activity() {
     }
 
     private fun makeResetShortcut() {
+        if (Reset.shortcutCreated) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+            Toast.makeText(this, "Android version is too low to make shortcuts (requires 7.1 or higher)", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val shortcutManager = this.applicationContext.getSystemService<ShortcutManager>(ShortcutManager::class.java) as ShortcutManager
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !shortcutManager.isRequestPinShortcutSupported) {
+            Toast.makeText(this, "PinShortcut is not supported (Home screen not supported, or Android version is below 8.0", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            shortcutManager.requestPinShortcut(
+                ShortcutInfo.Builder(this, "dynamic-reset")
+                    .setShortLabel(this.getString(R.string.reset_short_label))
+                    .setLongLabel(this.getString(R.string.reset_long_label))
+                    .setIcon(Icon.createWithResource(this, R.drawable.reset_foreground))
+                    .setActivity(ComponentName(this, Reset::class.java))
+                    .setIntent(Intent(ACTION_SHORTCUT_ADDED).setComponent(ComponentName(this, Reset::class.java)))
+                    .build(), PendingIntent.getBroadcast(this, Reset.REQ_CODE_SHORTCUT_ADDED_CALLBACK, Intent(Reset.ACTION_ADD_SHORTCUT).setPackage(PACKAGE_NAME).setComponent(
+                        ComponentName(this, ShortcutReceiver::class.java)), 0).intentSender)
+        }
+    }
+    private fun makeUninstallShortcut() {
+        if (Uninstall.shortcutCreated) return
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
             Toast.makeText(this, "Android version is too low to make shortcuts (requires 7.1 or higher)", Toast.LENGTH_SHORT).show()
             return
@@ -41,16 +73,19 @@ class Dummy : Activity() {
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             shortcutManager.requestPinShortcut(
-                ShortcutInfo.Builder(this, "dynamic-reset")
-                    .setShortLabel(this.getString(R.string.reset_short_label))
-                    .setLongLabel(this.getString(R.string.reset_long_label))
-                    .setIcon(Icon.createWithResource(this, R.drawable.reset_foreground))
-                    .setActivity(ComponentName(this, Reset::class.java))
-                    .setIntent(Intent(Intent.ACTION_VIEW).setComponent(ComponentName(this, Reset::class.java)))
-                    .build(), null)
+                ShortcutInfo.Builder(this, "dynamic-uninstall")
+                    .setShortLabel(this.getString(R.string.uninstall_short_label))
+                    .setLongLabel(this.getString(R.string.uninstall_long_label))
+                    .setIcon(Icon.createWithResource(this, R.drawable.unlock_foreground))
+                    .setActivity(ComponentName(this, Unlock::class.java))
+                    .setIntent(Intent(ACTION_SHORTCUT_ADDED).setComponent(ComponentName(this, Uninstall::class.java)))
+                    .build(), PendingIntent.getBroadcast(this, Uninstall.REQ_CODE_SHORTCUT_ADDED_CALLBACK, Intent(Uninstall.ACTION_ADD_SHORTCUT).setPackage(PACKAGE_NAME).setComponent(
+                    ComponentName(this, ShortcutReceiver::class.java)), 0).intentSender)
         }
     }
+
     private fun makeUnlockShortcut() {
+        if (Unlock.shortcutCreated) return
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
             Toast.makeText(this, "Android version is too low to make shortcuts (requires 7.1 or higher)", Toast.LENGTH_SHORT).show()
             return
@@ -67,8 +102,9 @@ class Dummy : Activity() {
                     .setLongLabel(this.getString(R.string.unlock_long_label))
                     .setIcon(Icon.createWithResource(this, R.drawable.unlock_foreground))
                     .setActivity(ComponentName(this, Unlock::class.java))
-                    .setIntent(Intent(Intent.ACTION_VIEW).setComponent(ComponentName(this, Unlock::class.java)))
-                    .build(), null)
+                    .setIntent(Intent(ACTION_SHORTCUT_ADDED).setComponent(ComponentName(this, Unlock::class.java)))
+                    .build(), PendingIntent.getBroadcast(this, Unlock.REQ_CODE_SHORTCUT_ADDED_CALLBACK, Intent(Unlock.ACTION_ADD_SHORTCUT).setPackage(PACKAGE_NAME).setComponent(
+                    ComponentName(this, ShortcutReceiver::class.java)), 0).intentSender)
         }
     }
 
@@ -131,4 +167,5 @@ class Dummy : Activity() {
         addIntent.putExtra("duplicate", false) //may it's already there so don't duplicate
         applicationContext.sendBroadcast(addIntent)
     }
+
 }

@@ -60,12 +60,12 @@ subprojects {
 //    apply(plugin = "androidx.navigation.safeargs.kotlin")
 }
 apply(plugin = "java")
-tasks {
-    named<Test>("test") {
-        testLogging.showExceptions = true
-        useJUnitPlatform()
-    }
-}
+//tasks {
+//    named<Test>("test") {
+//        testLogging.showExceptions = true
+//        useJUnitPlatform()
+//    }
+//}
 allprojects {
     repositories {
         google()

@@ -5,24 +5,28 @@
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.DELETE_PACKAGES" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="false"
         android:label="@string/app_name"
         android:supportsRtl="false"
         android:theme="@style/Theme.Transparent"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_foreground"
         >
         <uses-library android:name="android.test.runner" android:required="false" />
 
         <activity
-            android:name=".Dummy"
+            android:name=".ShortcutCreator"
             android:label="SetupSkip"
             android:theme="@style/Theme.NoDisplay"
             android:enabled="true"
@@ -40,18 +44,32 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
+        <activity
+            android:name=".ProvisioningSuccessActivity"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.app.action.PROVISIONING_SUCCESSFUL"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".Reset"
             android:label="@string/reset_long_label"
+            android:description="@string/reset_long_label"
             android:icon="@mipmap/reset"
             android:enabled="true"
             android:launchMode="singleTop"
             android:excludeFromRecents="true"
-            android:clearTaskOnLaunch="true">
+            android:clearTaskOnLaunch="true"
+            android:showOnLockScreen="true"
+            android:autoRemoveFromRecents="true"
+            android:theme="@style/Theme.Material.Translucent"
+            >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+<!--                <action android:name="net.csgstore.setupskip.Reset.ADD_SHORTCUT" />-->
                 <action android:name="net.csgstore.setupskip.Reset" />
+                <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.action.LAUNCHER" />
             </intent-filter>
@@ -62,13 +80,36 @@
         <activity
             android:name=".Unlock"
             android:label="@string/unlock_short_label"
+            android:description="@string/unlock_long_label"
             android:icon="@mipmap/unlock"
             android:enabled="true"
             android:launchMode="singleTop"
             android:excludeFromRecents="true"
             android:clearTaskOnLaunch="true">
             <intent-filter>
+<!--                <action android:name="net.csgstore.setupskip.Unlock.ADD_SHORTCUT" />-->
                 <action android:name="net.csgstore.setupskip.Unlock" />
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.action.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="net.csgstore.setupskip.REMOVE_DEVICE_ADMIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Uninstall"
+            android:label="@string/uninstall_short_label"
+            android:description="@string/uninstall_long_label"
+            android:icon="@mipmap/unlock"
+            android:enabled="true"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:clearTaskOnLaunch="true">
+            <intent-filter>
+<!--                <action android:name="net.csgstore.setupskip.Uninstall.ADD_SHORTCUT" />-->
+                <action android:name="net.csgstore.setupskip.Uninstall" />
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.action.LAUNCHER" />
@@ -91,9 +132,11 @@
                 android:name="android.app.device_admin"
                 android:resource="@xml/device_admin_policy" />
             <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
                 <action android:name="net.csgstore.setupskip.REMOVE_DEVICE_ADMIN" />
                 <action android:name="net.csgstore.setupskip.FACTORY_RESET" />
+                <action android:name="net.csgstore.setupskip.UNINSTALL" />
             </intent-filter>
         </receiver>
 
@@ -108,10 +151,36 @@
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <action android:name="net.csgstore.setupskip.REMOVE_DEVICE_ADMIN" />
                 <action android:name="net.csgstore.setupskip.FACTORY_RESET" />
+                <action android:name="net.csgstore.setupskip.UNINSTALL" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".ShortcutReceiver"
+            android:exported="true"
+            android:enabled="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="net.csgstore.setupskip.Reset.ADD_SHORTCUT" />
+                <action android:name="net.csgstore.setupskip.Unlock.ADD_SHORTCUT" />
+                <action android:name="net.csgstore.setupskip.Uninstall.ADD_SHORTCUT" />
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".InstallationReceiver"
+            android:exported="true"
+            android:enabled="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="net.csgstore.setupskip.INSTALL_COMPLETE" />
+                <action android:name="net.csgstore.setupskip.UNINSTALL_COMPLETE" />
             </intent-filter>
         </receiver>
 
         <service android:name=".MyAccessibilityService"
+            android:exported="true"
+            android:enabled="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:label="@string/accessibility_service_label">
             <intent-filter>
@@ -120,7 +189,6 @@
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
-
         </service>
 
 

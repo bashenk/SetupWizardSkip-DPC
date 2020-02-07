@@ -1,10 +1,7 @@
 package net.csgstore.setupskip
 
 import android.app.Activity
-import android.content.ComponentName
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 
 class Unlock : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,14 +10,21 @@ class Unlock : Activity() {
 
     override fun onStart() {
         super.onStart()
+        val task = AdminReceiver.getPostProvisioningTask(this)
         if (!this.isThisDeviceOwner) {
-            Toast.makeText(this, "App is not device owner.", Toast.LENGTH_SHORT).show()
+            this.showToast("App is already not device owner.")
+            finish()
             return
         }
-        val intent = Intent(AdminReceiver.INTENT_REMOVE_DEVICE_ADMIN)
-            .setPackage(PACKAGE_NAME)
-            .setComponent(ComponentName(this, PublicReceiver::class.java))
-        sendBroadcast(intent)
+        task.removeDeviceAdminFromSelf()
+//        sendBroadcast(Intent(AdminReceiver.INTENT_REMOVE_DEVICE_ADMIN).setPackage(PACKAGE_NAME).setComponent(ComponentName(this, PublicReceiver::class.java)))
+//        sendBroadcast(Intent(AdminReceiver.INTENT_UNINSTALL).setPackage(PACKAGE_NAME).setComponent(ComponentName(this, PublicReceiver::class.java)))
         finish()
+    }
+
+    companion object {
+        var shortcutCreated = false
+        const val ACTION_ADD_SHORTCUT = "net.csgstore.setupskip.Unlock.ADD_SHORTCUT"
+        const val REQ_CODE_SHORTCUT_ADDED_CALLBACK = 131
     }
 }
