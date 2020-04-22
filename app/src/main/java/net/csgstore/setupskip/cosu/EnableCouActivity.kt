@@ -1,4 +1,4 @@
-package net.csgstore.setupskip
+package net.csgstore.setupskip.cosu
 
 import android.app.Activity
 import android.app.DownloadManager
@@ -9,12 +9,10 @@ import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.os.*
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
-import net.csgstore.setupskip.cosu.CosuConfig
-import net.csgstore.setupskip.cosu.CosuUtils
+import net.csgstore.setupskip.AdminReceiver
+import net.csgstore.setupskip.PackageInstallationUtils
 import net.csgstore.setupskip.cosu.CosuUtils.startDownload
-import net.csgstore.setupskip.cosu.KioskModeActivity
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.InputStream

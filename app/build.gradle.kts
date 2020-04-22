@@ -1,5 +1,3 @@
-import com.android.build.gradle.api.ApplicationVariant
-
 android {
     signingConfigs {
         register("release") {
@@ -74,7 +72,6 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("androidx.annotation:annotation:1.1.0")
     implementation("androidx.legacy:legacy-preference-v14:1.0.0")
-    implementation(group = "commons-io", name = "commons-io", version= "2.0.1")
     //    implementation(kotlin("stdlib"))
     //    implementation("androidx.appcompat:appcompat:1.1.0-rc01")
     //    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
@@ -160,37 +157,8 @@ kotlin {
 //    experimental.coroutines = org.jetbrains.kotlin.gradle.dsl.Coroutines.DEFAULT
 }
 
-@SuppressWarnings("UnnecessaryQualifiedReference")
-fun configureOutputFileName(variant: com.android.build.gradle.api.BaseVariant, project: Project, baseOnly: Boolean = true) {
-    variant.outputs.all {
-        val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-        val buildType = variant.buildType.name
-        var tmpOutputFileName = outputImpl.outputFileName
-        if (variant is ApplicationVariant) {
-            val fileName = if (baseOnly) "${project.name}.apk" else "${project.name}-${variant.versionName}_${buildType}.apk"
-            val defaultOutputDir = variant.packageApplicationProvider!!.get().outputDirectory
-            val tmpOutputFile = File(defaultOutputDir.asFile.get().absolutePath, fileName)
-            allprojects {
-                ext {
-                    set("apkFile", tmpOutputFile)
-                }
-            }
-            tmpOutputFileName = tmpOutputFile.name
-        } else if (variant is com.android.build.gradle.api.LibraryVariant) {
-            val fileName = if (baseOnly) "${project.name}.apk" else "${project.name}_${buildType}.apk"
-            val defaultOutputDir = variant.packageLibraryProvider!!.get().destinationDirectory.asFile.get()
-            tmpOutputFileName = File(defaultOutputDir.absolutePath, fileName).name
-        }
-        outputImpl.outputFileName = tmpOutputFileName
-        //        println(tmpOutputFileName)
-    }
-}
-
 fun findProperty(propertyName: String): String? = project.findProperty(propertyName) as String? ?: System.getenv(propertyName)
 
 @Suppress("unused")
 fun DependencyHandler.lamba(module: String, version: String? = null): Any =
     "com.github.lamba92:$module${version?.let { ":$version" } ?: ""}"
-
-apply (plugin = "org.hidetake.ssh")
-//apply { from("ssh.gradle.kts") }

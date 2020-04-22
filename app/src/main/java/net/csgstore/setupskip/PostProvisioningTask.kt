@@ -24,6 +24,7 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.CheckBox
 import android.widget.Toast
+import net.csgstore.setupskip.cosu.EnableCosuActivity
 import java.io.IOException
 import java.lang.ref.WeakReference
 

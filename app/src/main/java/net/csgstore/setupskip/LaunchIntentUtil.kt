@@ -3,6 +3,7 @@ package net.csgstore.setupskip
 import android.accounts.Account
 import android.content.Intent
 import android.os.PersistableBundle
+import net.csgstore.setupskip.cosu.EnableCosuActivity
 
 
 /**

@@ -313,4 +313,5 @@ Thumbs.db
 /QR_Code/
 !/QR_Code/QR_Code_Public.json.png
 !/QR_Code/README.md
-app/ssh.gradle.kts
+ssh.gradle.kts
+/buildSrc/src/main/kotlin/ssh.kt

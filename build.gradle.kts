@@ -16,8 +16,7 @@ buildscript {
         classpath("com.google.gms:google-services:4.3.3")
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.9.7")
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.2.2")
-        classpath("org.hidetake:gradle-ssh-plugin:2.10.1")
-//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.70-eap-42")
+//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
    }
 }
 
@@ -28,7 +27,6 @@ plugins {
     kotlin("android") apply false
 //    kotlin("android.extensions") apply false
     kotlin("kapt") apply false
-    id("org.hidetake.ssh") version "2.10.1" apply false
 }
 
 fun findProperty(propertyName: String): String? =
@@ -46,7 +44,7 @@ val Project.application: Boolean get() = type == "application"
 val Project.library: Boolean get() = type == "library"
 val Project.iosApp: Boolean get() = type == "iosApp"
 
-apply(plugin = "java")
+//apply(plugin = "java")
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
