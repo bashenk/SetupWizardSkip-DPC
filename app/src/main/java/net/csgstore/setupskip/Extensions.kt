@@ -1,6 +1,7 @@
 package net.csgstore.setupskip
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.AlertDialog
 import android.app.admin.DevicePolicyManager
 import android.content.Context
@@ -106,6 +107,9 @@ fun Activity.createDialog(
 /** Returns the DevicePolicyManager instance. **/
 val Context.devicePolicyManager: DevicePolicyManager
     get() = applicationContext.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+/** Returns the DevicePolicyManager instance. **/
+val Context.activityManager: ActivityManager
+    get() = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
 /** Returns the UserManager instance. **/
 @get:RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1) val Context.userManager: UserManager

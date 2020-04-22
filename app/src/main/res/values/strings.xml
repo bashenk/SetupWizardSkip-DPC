@@ -19,5 +19,6 @@
     <string name="wipe_data_include">Also wipe:</string>
     <string name="external_storage">External storage</string>
     <string name="reset_protection_data">Factory reset protection</string>
+    <string name="kiosk_app_package_name">net.csgstore.hotspotkiosk</string>
 
 </resources>

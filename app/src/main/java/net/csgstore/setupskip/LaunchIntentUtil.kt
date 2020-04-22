@@ -26,8 +26,7 @@ object LaunchIntentUtil {
      * a cosu extra in the admin extras.
      */
     fun isCosuLaunch(extras: PersistableBundle?): Boolean {
-        return extras != null && false
-    }
+        return extras != null && (extras.get(EnableCosuActivity.BUNDLE_KEY_COSU_CONFIG) != null);    }
 
     /**
      * @returns true if TestDPC was launched as part of synchronous authentication flow in setup

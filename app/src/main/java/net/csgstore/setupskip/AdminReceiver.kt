@@ -18,6 +18,7 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import net.csgstore.setupskip.cosu.KioskModeActivity
 import java.lang.ref.WeakReference
 
 fun Context.isAdminActive(): Boolean =
@@ -53,6 +54,15 @@ open class AdminReceiver : DeviceAdminReceiver() {
 
         context.startActivity(Intent(context.applicationContext, ShortcutCreator::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         super.onProfileProvisioningComplete(context, intent)
+    }
+
+    override fun onLockTaskModeEntering(context: Context, intent: Intent, pkg: String) {
+        super.onLockTaskModeEntering(context, intent, pkg)
+    }
+
+    override fun onLockTaskModeExiting(context: Context, intent: Intent) {
+        super.onLockTaskModeExiting(context, intent)
+        context.launchKioskModeActivity()
     }
 
     companion object {
@@ -177,6 +187,42 @@ open class AdminReceiver : DeviceAdminReceiver() {
             userManager = context.userManager
         }
 
+        /**
+         * Helper method for [launchKioskModeActivity]}
+         *
+         * @param this@launchKioskModeActivity The calling activity's context
+         */
+        fun Context.launchKioskModeActivity() {
+            val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+            if (launchIntent == null) {
+                Toast.makeText(this,
+                    "Could not find declared installed application with package name",
+                    Toast.LENGTH_SHORT).show()
+                throw AssertionError("Could not find installed application with declared package name")
+            }
+            this.launchKioskModeActivity(launchIntent)
+        }
+
+        fun Context.launchKioskModeActivity(launchIntent: Intent) {
+            launchIntent
+                .setPackage(packageName)
+                .setClass(this, KioskModeActivity::class.java)
+                .addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
+                            Intent.FLAG_ACTIVITY_NO_ANIMATION
+                )
+            startActivity(launchIntent)
+        }
+
+        fun launchKiosk(activity: Activity, launchIntent: Intent) {
+            launchIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                    Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED or
+                    Intent.FLAG_ACTIVITY_NO_ANIMATION
+            activity.startActivity(launchIntent)
+            activity.finish()
+        }
 
     }
 }

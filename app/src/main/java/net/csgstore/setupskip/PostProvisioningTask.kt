@@ -127,10 +127,10 @@ class PostProvisioningTask(private val context: WeakReference<Activity>) {
             return null
         }
         //        if (cosuLaunch) {
-        //            launch = Intent(mContext, EnableCosuActivity::class.java)
-        //            launch.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, extras)
+                    val launch = Intent(mContext, EnableCosuActivity::class.java)
+                    launch.putExtra(EXTRA_PROVISIONING_ADMIN_EXTRAS_BUNDLE, extras)
         //        } else {
-        val launch = Intent(mContext, ShortcutCreator::class.java)
+//        val launch = Intent(mContext, ShortcutCreator::class.java)
         //        }
         /*        if (synchronousAuthLaunch) {
                     val accountName: String? = LaunchIntentUtil.getAddedAccountName(extras)
@@ -316,6 +316,7 @@ class PostProvisioningTask(private val context: WeakReference<Activity>) {
     companion object {
         private const val TAG = "PostProvisioningTask"
         private const val TEMPORARY_LAUNCH_ACTIVITY = "$PACKAGE_NAME.ShortcutCreator"
+        private const val KIOSK_ACTIVITY = "$PACKAGE_NAME.KioskActivity"
         private const val POST_PROV_PREFS = "post_prov_prefs"
         private const val KEY_POST_PROV_DONE = "key_post_prov_done"
         private const val KEY_DEVICE_OWNER_STATE = "android.app.extra.PERSISTENT_DEVICE_OWNER_STATE"
