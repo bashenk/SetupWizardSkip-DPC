@@ -7,7 +7,7 @@ pluginManagement {
             "io.fabric" -> useModule("io.fabric.tools:gradle:1.4.8")
             else -> when {
                 requested.id.id.startsWith("com.android", true) -> {
-                    useVersion("3.5.5")
+                    useVersion("4.0.0-beta04")
                 }
                 requested.id.namespace.toString().startsWith("org.jetbrains.kotlin",true) -> {
                     println("${requested.id.id}: ${requested.version}")
@@ -17,16 +17,16 @@ pluginManagement {
         }
     }
     repositories {
+        maven("https://plugins.gradle.org/m2/")
+        mavenCentral()
         google()
         jcenter()
-        mavenCentral()
         maven("https://dl.bintray.com/kotlin/kotlin-eap")
         maven("https://dl.bintray.com/kotlin/kotlin-dev")
         maven("https://kotlin.bintray.com/kotlinx")
         maven("https://maven.fabric.io/public")
         maven("https://maven.google.com")
         maven("https://jitpack.io")
-        maven("https://plugins.gradle.org/m2/")
         mavenLocal()
     }
 }
@@ -55,4 +55,4 @@ rootProject.name = "SetupSkip"
 
 rootProject.buildFileName = "build.gradle.kts"
 include(":app")
-enableFeaturePreview("GRADLE_METADATA")
+//enableFeaturePreview("GRADLE_METADATA")
