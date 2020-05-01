@@ -7,7 +7,7 @@ pluginManagement {
             "io.fabric" -> useModule("io.fabric.tools:gradle:1.4.8")
             else -> when {
                 requested.id.id.startsWith("com.android", true) -> {
-                    useVersion("4.0.0-beta04")
+                    useVersion("4.0.0-beta05")
                 }
                 requested.id.namespace.toString().startsWith("org.jetbrains.kotlin",true) -> {
                     println("${requested.id.id}: ${requested.version}")
@@ -51,7 +51,7 @@ fun PluginResolveDetails.getVersion(fallback: String) =
 }*/
 
 // Configure this per project
-rootProject.name = "SetupSkip"
+rootProject.name = "HotspotKiosk"
 
 rootProject.buildFileName = "build.gradle.kts"
 include(":app")

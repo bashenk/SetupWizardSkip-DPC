@@ -19,7 +19,7 @@ dependencies {
     testImplementation("junit:junit:4.12")
     testImplementation("org.assertj:assertj-core:3.6.2")
 
-    implementation("com.android.tools.build:gradle:4.0.0-beta04")
+    implementation("com.android.tools.build:gradle:4.0.0-beta05")
     implementation(kotlin("gradle-plugin", "1.3.72"))
 
     implementation(kotlin("android-extensions"))

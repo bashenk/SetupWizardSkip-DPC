@@ -9,10 +9,10 @@ android {
     }
     compileSdkVersion(29)
     defaultConfig {
-        if (this@defaultConfig is com.android.build.gradle.AppExtension) {
+        if (this@android is com.android.build.gradle.AppExtension) {
             applicationId = "net.csgstore.${rootProject.name.toLowerCase()}"
             applicationVariants.all { configureOutputFileName(this, project.rootProject) }
-        } else if (this@defaultConfig is com.android.build.gradle.LibraryExtension) {
+        } else if (this@android is com.android.build.gradle.LibraryExtension) {
             libraryVariants.all { configureOutputFileName(this, project.rootProject) }
         }
         minSdkVersion(21)

@@ -12,7 +12,7 @@ buildscript {
     }
     dependencies {
         classpath(group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin")
-        classpath("com.android.tools.build:gradle:4.0.0-beta04")
+        classpath("com.android.tools.build:gradle:4.0.0-beta05")
         classpath("com.google.gms:google-services:4.3.3")
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.9.7")
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.2.2")
