@@ -1,3 +1,13 @@
+plugins {
+    base
+    kotlin("jvm") apply false
+    kotlin("multiplatform") apply false
+    kotlin("android") apply false
+    //    kotlin("android.extensions") apply false
+    kotlin("kapt") apply false
+    id("net.csgstore.ssh") apply false
+}
+
 buildscript {
     repositories {
         maven("https://plugins.gradle.org/m2/")
@@ -14,19 +24,18 @@ buildscript {
         classpath(group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin")
         classpath("com.android.tools.build:gradle:4.0.0-beta05")
         classpath("com.google.gms:google-services:4.3.3")
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.9.7")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.15.2")
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.2.2")
-//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
-   }
+        //        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4-M1")
+    }
 }
 
-plugins {
-    base
-    kotlin("jvm") apply false
-    kotlin("multiplatform") apply false
-    kotlin("android") apply false
-//    kotlin("android.extensions") apply false
-    kotlin("kapt") apply false
+repositories {
+    jcenter()
+    maven("https://plugins.gradle.org/m2/")
+    mavenCentral()
+    google()
+    gradlePluginPortal()
 }
 
 fun findProperty(propertyName: String): String? =
@@ -51,19 +60,15 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.kapt")
     when {
         application -> {
-//            apply(plugin = "org.jetbrains.kotlin.android")
             apply(plugin = "com.android.application")
         }
-        library -> {
-//            apply(plugin = "org.jetbrains.kotlin.android")
-            apply(plugin = "com.android.library")
-        }
+        library -> { apply(plugin = "com.android.library") }
         else -> { return@subprojects }
     }
 //    apply(plugin = "org.jetbrains.kotlin.android.extensions")
 //    apply(plugin = "androidx.navigation.safeargs.kotlin")
 }
-//apply(plugin = "java")
+apply(plugin = "java")
 //tasks {
 //    named<Test>("test") {
 //        testLogging.showExceptions = true
