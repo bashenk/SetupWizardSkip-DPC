@@ -1,3 +1,9 @@
+import net.csgstore.*
+
+plugins {
+    id("net.csgstore.ssh")
+}
+
 android {
     signingConfigs {
         register("release") {
@@ -9,11 +15,11 @@ android {
     }
     compileSdkVersion(29)
     defaultConfig {
-        if (this@defaultConfig is com.android.build.gradle.AppExtension) {
+        if (this@android is com.android.build.gradle.AppExtension) {
             applicationId = "net.csgstore.${rootProject.name.toLowerCase()}"
-            applicationVariants.all { configureOutputFileName(this, project.rootProject) }
-        } else if (this@defaultConfig is com.android.build.gradle.LibraryExtension) {
-            libraryVariants.all { configureOutputFileName(this, project.rootProject) }
+            applicationVariants.all { configureOutputFileName(this, rootProject, "%1\$s-%3\$s") }
+        } else if (this@android is com.android.build.gradle.LibraryExtension) {
+            libraryVariants.all { configureOutputFileName(this, rootProject) }
         }
         minSdkVersion(21)
         targetSdkVersion(29)
@@ -65,6 +71,9 @@ android {
     packagingOptions {
         exclude("META-INF/*.kotlin_module")
         //        exclude("META-INF/kotlin-stdlib*")
+    }
+    buildOutputs {
+
     }
 }
 
@@ -154,11 +163,5 @@ kotlin {
             }
         }
     }
-//    experimental.coroutines = org.jetbrains.kotlin.gradle.dsl.Coroutines.DEFAULT
+    //    experimental.coroutines = org.jetbrains.kotlin.gradle.dsl.Coroutines.DEFAULT
 }
-
-fun findProperty(propertyName: String): String? = project.findProperty(propertyName) as String? ?: System.getenv(propertyName)
-
-@Suppress("unused")
-fun DependencyHandler.lamba(module: String, version: String? = null): Any =
-    "com.github.lamba92:$module${version?.let { ":$version" } ?: ""}"

@@ -1,5 +1,6 @@
 package net.csgstore.setupskip
 
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.PendingIntent
@@ -12,13 +13,20 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
-import net.csgstore.setupskip.AdminReceiver.Companion.getPostProvisioningTask
 import net.csgstore.setupskip.ShortcutReceiver.Companion.ACTION_SHORTCUT_ADDED
 
 
 class ShortcutCreator : Activity() {
 
-    private val runOnce by lazy {Settings.Secure.getInt(this.contentResolver, Settings.Secure.ADB_ENABLED, 0) == 1}
+    @delegate:SuppressLint("ObsoleteSdkInt")
+    private val runOnce by lazy {
+        if (Build.VERSION.SDK_INT >= 17)
+            Settings.Global.getInt(this.contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
+        else {
+            @Suppress("DEPRECATION")
+            Settings.Secure.getInt(this.contentResolver, Settings.Secure.ADB_ENABLED, 0) == 1
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,6 +149,7 @@ class ShortcutCreator : Activity() {
         return true
     }
 
+    @Suppress("DEPRECATION")
     private fun addResetShortcut() {
         val shortcutIntent = Intent(applicationContext, Reset::class.java)
         shortcutIntent.action = Intent.ACTION_MAIN
@@ -154,6 +163,7 @@ class ShortcutCreator : Activity() {
         addIntent.putExtra("duplicate", false) //may it's already there so don't duplicate
         applicationContext.sendBroadcast(addIntent)
     }
+    @Suppress("DEPRECATION")
     private fun addUnlockShortcut() {
         val shortcutIntent = Intent(applicationContext, Unlock::class.java)
         shortcutIntent.action = Intent.ACTION_MAIN

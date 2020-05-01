@@ -1,8 +1,10 @@
+package net.csgstore
+
+/*
 import com.android.build.gradle.BaseExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.extra
 import java.util.*
 import java.io.*
 
@@ -46,27 +48,5 @@ class MyModulePlugin : Plugin<Project> {
         }
     }
 }
-@SuppressWarnings("UnnecessaryQualifiedReference")
-fun configureOutputFileName(variant: com.android.build.gradle.api.BaseVariant, project: Project, baseOnly: Boolean = true) {
-    variant.outputs.all {
-        val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-        val buildType = variant.buildType.name
-        var tmpOutputFileName = outputImpl.outputFileName
-        if (variant is com.android.build.gradle.api.ApplicationVariant) {
-            val fileName = if (baseOnly) "${project.name}.apk" else "${project.name}-${variant.versionName}_${buildType}.apk"
-            val defaultOutputDir = variant.packageApplicationProvider!!.get().outputDirectory
-            val tmpOutputFile = File(defaultOutputDir.asFile.get().absolutePath, fileName)
-            project.allprojects {
-                extra.set("apkFile", tmpOutputFile)
-            }
-            tmpOutputFileName = tmpOutputFile.name
-        } else if (variant is com.android.build.gradle.api.LibraryVariant) {
-            val fileName = if (baseOnly) "${project.name}.apk" else "${project.name}_${buildType}.apk"
-            val defaultOutputDir = variant.packageLibraryProvider!!.get().destinationDirectory.asFile.get()
-            tmpOutputFileName = File(defaultOutputDir.absolutePath, fileName).name
-        }
-        outputImpl.outputFileName = tmpOutputFileName
-        //        println(tmpOutputFileName)
-    }
-}
 
+*/
